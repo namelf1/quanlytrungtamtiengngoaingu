@@ -185,4 +185,188 @@ where TTHocVien.MaCD = THI.MaCD and TTHocVien.MaHV =
 Thi.MaHV and thi.MaCD = @macd and Thi.DiemCD<=5
 else print N'Không có cấp độ này'
 end
+exec HV_ThiLai 'Level 4'
+exec HV_ThiLai 'Level 15'
+```
+1.2 Đưa ra danh sách giảng viên có mức độ khen thưởng từ 1,5-2
+```SQL
+create proc KT_GV
+as begin
+select giangvien.magv,tengv,mucdokt
+from giangvien,KHENTHUONG
+where giangvien.magv=KHENTHUONG.magv and MucdoKT >=1.5 and
+mucdokt <=2
+end
+exec KT_GV
+```
+1.3 Thủ tục đưa ra danh sách học viên của 1 lớp nào đó
+```SQL
+create proc DS_HV
+@malop char(10)
+as
+begin
+if(exists (Select * from LOP where malop=@malop))
+select mahv, tenhv, gioitinh, lop.malop
+from HOCVIEN, LOP
+where lop.malop=@malop and hocvien.MaLop = lop.MaLop
+else
+print N'Lớp đó không tồn tại trong CSDL'
+end
+exec DS_HV 'L01'
+```
+1.4 Viết một thủ tục đưa ra danh sách nhân viên với các thông tin MaNV, TenNV, SobuoiQL, MaLop.Danh sách đưa ra dưới dạng con trỏ OUTPUT của thủ tục
+```SQL
+Create procedure TTNHANVIEN
+@dsnv CURSOR VARYING OUTPUT
+as
+begin
+set @dsnv = CURSOR
+for
+select NHANVIEN.MaNV, TenNV, SobuoiQL, LOP.MaLop
+from NHANVIEN, LOP
+where NHANVIEN.MaNV = LOP.MaNV
+open @dsnv
+end
+declare @mycursor CURSOR
+exec TTNHANVIEN @dsnv = @mycursor output
+fetch next from @mycursor
+while (@@FETCH_STATUS=0)
+fetch next from @mycursor
+close @mycursor
+deallocate @mycursor
+```
+### 2. Hàm
+2.1 Viết 1 hàm trả về dtb của 1 học viên nào đó
+```SQL
+Create function diemtrungbinh (@mahv char(10))
+returns real
+as
+begin
+declare @dtb real;
+select @dtb= avg(DiemCD)
+From THI, hocvien, capdokh
+where thi.mahv = hocvien.mahv and thi.macd=capdokh.macd and thi.mahv = @mahv
+return @dtb
+end
+select dbo.diemtrungbinh ('HV04')
+```
+2.2 Viết một hàm trả về những học viên đạt loại giỏi của cấp độ bất kì (dtb>8)
+```SQL
+create function hv_gioi (@macd char(10))
+returns table
+as
+return (select tthocvien.mahv, tenhv, tthocvien.macd, tencd, avg(diemcd) as dtb
+from tthocvien,thi
+where @macd = tthocvien.macd and tthocvien.mahv = thi.mahv and
+tthocvien.macd = thi.macd
+group by tthocvien.mahv, tenhv, tthocvien.macd, tencd
+having avg(diemcd) >= 8)
+select * from hv_gioi ('level 2')
+```
+2.3 Viết hàm trả về danh sách các cấp độ và số lượng tài liệu của cấp độ đó, đưa ra danh sach các cấp độ có số lượng tài liệu ít nhất
+```SQL
+create function soluongTL ()
+returns @bang table (macd char(10), sotl int)
+as
+begin
+insert into @bang
+select tailieu.macd, count (matl)
+from tailieu
+group by tailieu.macd
+return
+end
+select macd, sotl
+from soluongTL()
+where sotl = (select min(sotl) from soluongTL())
+```
+2.4 Viết f_hocphi cua hv nào đó với f_hocphi bằng tổng số tổng tiền ứng với mỗi cấp độ mà hv đó đăng kí */
+```SQL
+Create function f_hocphi (@mahv char(10))
+returns real
+as
+begin
+declare @hocphi real
+select @hocphi = sum(tongtien)
+from HOCPHI, TTHocVien
+where mahv = @mahv and HOCPHI.MaCD=TTHocVien.macd
+return @hocphi
+end
+select dbo.f_hocphi ('HV03')
+```
+### 3. Trigger và cursor
+3.1 Trigger thêm 1 học viên ở bảng học viên thì cập nhật học viên dự kiến ở bảng lớp(mã lớp)
+```SQL
+create trigger insert_HV on HocVien For insert as
+if(exists(select * from inserted))
+begin
+update lop
+set HVDK =hvdk +1 where malop =(select malop from inserted)
+end
+
+select * from lop
+select * from hocvien
+
+Insert into KHOAHOC
+Values ('K13','toeic 3',N'Cam kết đầu ra')
+Insert into HOCVIEN
+Values ('HV13',N'Hoàng','2011/12/20',N'Nam',2345,'K12','L05')
+```
+3.2 Trigger để không cho cập nhật mahv
+```SQL
+create trigger NO_update on HOCVIEN for update
+as
+begin
+if(update(mahv))
+begin
+print N'bạn không được phép cập nhật cột mahv'
+rollback tran;
+end
+else
+print N'bạn đã cập nhật thành công';
+end
+
+update hocvien
+set mahv = 'HV14'
+where tenhv like N'Thúy Lan'
+```
+3.3 Trigger tên cấp độ khoá học không được trùng nhau
+```SQL
+create trigger Update_CapdoKH on CAPDOKH for update
+as
+if (((select TenCD from inserted) != (select TenCD from deleted))
+and (select count(*) from CAPDOKH where TenCD = (select TenCD
+from inserted))<=1)
+print N'Sửa thành công';
+else begin
+print N'Sửa không thành công, nhập tên khác';
+rollback tran;
+end
+
+UPDATE CAPDOKH SET TENCD = N'Start' WHERE MaCD = 'Level 1'
+UPDATE CAPDOKH SET TENCD = N'Begin' WHERE MaCD = 'Level 1'
+```
+3.4 cursor Hiển thị ra hv có điểm tb cao nhất
+```SQL
+declare max_dtb cursor
+dynamic scroll
+for
+select hocvien.mahv, tenhv, dbo.diemtrungbinh(mahv) as maxdtb
+from hocvien group by hocvien.mahv, tenhv
+having dbo.diemtrungbinh(mahv) = (SELECT
+max(dbo.diemtrungbinh(mahv)) AS maxdtb FROM hocvien)
+open max_dtb;
+declare @mahv char(5) , @tenhv nvarchar (30) , @avgdiemmax float
+FETCH NEXT FROM max_dtb INTO @mahv,@tenhv,@avgdiemmax
+PRINT N'Điểm trung bình cao nhất là
+'+CONVERT(char(4),@avgdiemmax);
+WHILE (@@FETCH_STATUS=0)
+BEGIN
+PRINT N'Những sinh viên sau có điểm cao nhất: ';
+PRINT N'Sinh viên '+@tenhv +N' có điểm tb
+'+CONVERT(char(4),@avgdiemmax);
+FETCH NEXT FROM max_dtb INTO
+@mahv,@tenhv,@avgdiemmax
+END
+CLOSE max_dtb;
+DEALLOCATE max_dtb;
 ```
