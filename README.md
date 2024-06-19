@@ -30,6 +30,9 @@ Hiện nay rất nhiều trung tâm Tiếng Anh được mở lên nhằm đào 
 10. Bảng GIANGDAY: GIANGDAY(#MaGV, @MaLop, @NgayGD)
 11. Bảng THI: THI(#MaHV, @MaCD, @DiemCD)
 
+Sơ đồ thực thể
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/649555c8-ac72-4dbc-806d-fc4d5b5b6e11)
+
 ## Tạo hệ thống
 + Tạo bảng: https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20T%E1%BA%A1o%20B%E1%BA%A3ng.sql
 + Thêm dữ liệu: https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20Th%C3%AAm%20d%E1%BB%AF%20li%E1%BB%87u.sql
