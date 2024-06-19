@@ -185,9 +185,16 @@ where TTHocVien.MaCD = THI.MaCD and TTHocVien.MaHV =
 Thi.MaHV and thi.MaCD = @macd and Thi.DiemCD<=5
 else print N'Không có cấp độ này'
 end
+```
+Thực nghiệm:
+```SQL
 exec HV_ThiLai 'Level 4'
+```
+
+```SQL
 exec HV_ThiLai 'Level 15'
 ```
+
 1.2 Đưa ra danh sách giảng viên có mức độ khen thưởng từ 1,5-2
 ```SQL
 create proc KT_GV
