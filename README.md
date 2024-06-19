@@ -190,10 +190,12 @@ Thực nghiệm:
 ```SQL
 exec HV_ThiLai 'Level 4'
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/fb8d41f0-4a47-418e-8fc5-579ee939b170)
 
 ```SQL
 exec HV_ThiLai 'Level 15'
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/52d9f070-22a7-4250-a680-8655940161d1)
 
 1.2 Đưa ra danh sách giảng viên có mức độ khen thưởng từ 1,5-2
 ```SQL
@@ -204,8 +206,13 @@ from giangvien,KHENTHUONG
 where giangvien.magv=KHENTHUONG.magv and MucdoKT >=1.5 and
 mucdokt <=2
 end
+```
+Thực nghiệm:
+```SQL
 exec KT_GV
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/d2a11c8c-a8c8-4cc7-ba60-fdf1283b98a1)
+
 1.3 Thủ tục đưa ra danh sách học viên của 1 lớp nào đó
 ```SQL
 create proc DS_HV
@@ -219,8 +226,13 @@ where lop.malop=@malop and hocvien.MaLop = lop.MaLop
 else
 print N'Lớp đó không tồn tại trong CSDL'
 end
+```
+Thực nghiệm:
+```SQL
 exec DS_HV 'L01'
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/f0980652-1c48-4375-90dc-519f0cc43df3)
+
 1.4 Viết một thủ tục đưa ra danh sách nhân viên với các thông tin MaNV, TenNV, SobuoiQL, MaLop.Danh sách đưa ra dưới dạng con trỏ OUTPUT của thủ tục
 ```SQL
 Create procedure TTNHANVIEN
@@ -242,6 +254,8 @@ fetch next from @mycursor
 close @mycursor
 deallocate @mycursor
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/b133f0ae-6a09-49c0-8672-6858abed7916)
+
 ### 2. Hàm
 2.1 Viết 1 hàm trả về dtb của 1 học viên nào đó
 ```SQL
@@ -255,8 +269,13 @@ From THI, hocvien, capdokh
 where thi.mahv = hocvien.mahv and thi.macd=capdokh.macd and thi.mahv = @mahv
 return @dtb
 end
+```
+Thực nghiệm:
+```SQL
 select dbo.diemtrungbinh ('HV04')
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/e4def681-1e8e-4b3c-b662-5e31d9485bf3)
+
 2.2 Viết một hàm trả về những học viên đạt loại giỏi của cấp độ bất kì (dtb>8)
 ```SQL
 create function hv_gioi (@macd char(10))
@@ -268,8 +287,13 @@ where @macd = tthocvien.macd and tthocvien.mahv = thi.mahv and
 tthocvien.macd = thi.macd
 group by tthocvien.mahv, tenhv, tthocvien.macd, tencd
 having avg(diemcd) >= 8)
+```
+Thực nghiệm:
+```SQL
 select * from hv_gioi ('level 2')
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/cec4fe25-1a21-4d7a-8106-44a0f2d83b2c)
+
 2.3 Viết hàm trả về danh sách các cấp độ và số lượng tài liệu của cấp độ đó, đưa ra danh sach các cấp độ có số lượng tài liệu ít nhất
 ```SQL
 create function soluongTL ()
@@ -282,10 +306,15 @@ from tailieu
 group by tailieu.macd
 return
 end
+```
+Thực nghiệm:
+```SQL
 select macd, sotl
 from soluongTL()
 where sotl = (select min(sotl) from soluongTL())
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/b1c6ab0e-22c5-4540-9ef1-c557c5b3d08d)
+
 2.4 Viết f_hocphi cua hv nào đó với f_hocphi bằng tổng số tổng tiền ứng với mỗi cấp độ mà hv đó đăng kí */
 ```SQL
 Create function f_hocphi (@mahv char(10))
@@ -309,15 +338,22 @@ begin
 update lop
 set HVDK =hvdk +1 where malop =(select malop from inserted)
 end
-
+```
+Thực nghiệm:
+```SQL
 select * from lop
 select * from hocvien
+```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/a7417cc0-c989-440c-b6cf-46f398facc42)
 
+```SQL
 Insert into KHOAHOC
 Values ('K13','toeic 3',N'Cam kết đầu ra')
 Insert into HOCVIEN
 Values ('HV13',N'Hoàng','2011/12/20',N'Nam',2345,'K12','L05')
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/e8295564-3e08-4a54-aa3e-53b9b0fd4d72)
+
 3.2 Trigger để không cho cập nhật mahv
 ```SQL
 create trigger NO_update on HOCVIEN for update
@@ -331,11 +367,15 @@ end
 else
 print N'bạn đã cập nhật thành công';
 end
-
+```
+Thực nghiệm:
+```
 update hocvien
 set mahv = 'HV14'
 where tenhv like N'Thúy Lan'
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/83c0d74f-aed2-4cd2-b95c-e89b13a656f4)
+
 3.3 Trigger tên cấp độ khoá học không được trùng nhau
 ```SQL
 create trigger Update_CapdoKH on CAPDOKH for update
@@ -348,10 +388,17 @@ else begin
 print N'Sửa không thành công, nhập tên khác';
 rollback tran;
 end
-
+```
+Thực nghiệm:
+```SQL
 UPDATE CAPDOKH SET TENCD = N'Start' WHERE MaCD = 'Level 1'
+```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/cea24615-e5ce-46fd-831a-3a24852b4402)
+```SQL
 UPDATE CAPDOKH SET TENCD = N'Begin' WHERE MaCD = 'Level 1'
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/6ac2699c-b1d9-446e-a0ed-a87d1a7b65b6)
+
 3.4 cursor Hiển thị ra hv có điểm tb cao nhất
 ```SQL
 declare max_dtb cursor
@@ -377,3 +424,4 @@ END
 CLOSE max_dtb;
 DEALLOCATE max_dtb;
 ```
+![image](https://github.com/namelf1/quanlytrungtamtiengngoaingu/assets/124643678/ef4666c4-70f8-47d3-a825-00f0fe2dbac8)
