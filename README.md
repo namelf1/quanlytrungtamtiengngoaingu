@@ -29,3 +29,11 @@ Hiện nay rất nhiều trung tâm Tiếng Anh được mở lên nhằm đào 
 9. Bảng TAILIEU: TAILIEU(#MaTL, @TenTL, @MaCD)
 10. Bảng GIANGDAY: GIANGDAY(#MaGV, @MaLop, @NgayGD)
 11. Bảng THI: THI(#MaHV, @MaCD, @DiemCD)
+
+## Tạo hệ thống
++ Tạo bảng: https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20T%E1%BA%A1o%20B%E1%BA%A3ng.sql
++ Thêm dữ liệu: https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20Th%C3%AAm%20d%E1%BB%AF%20li%E1%BB%87u.sql
+## Xây dựng một số thủ tục
++ https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20truy%20v%E1%BA%A5n.sql
++ https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20h%C3%A0m.sql
++ https://github.com/namelf1/quanlytrungtamtiengngoaingu/blob/main/Query%20trigger%20v%C3%A0%20cursor.sql
